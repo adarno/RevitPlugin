@@ -54,36 +54,56 @@ namespace UI_Prototype
             grid.ColumnCount = 1;
             grid.Columns[0].Name = "Wall Elements";
 
+            List<string> wallIDs = new List<string>();
+
             // open file
             using (OpenFileDialog ofd = new OpenFileDialog() { Filter = "CSV|*.csv", ValidateNames = true })
             {
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    using (TextFieldParser parser = new TextFieldParser(ofd.FileName))
+                    String path = ofd.FileName.ToString();
+                    string[] lines = System.IO.File.ReadAllLines(path);
+                    
+                    for (int i=1; i < lines.Length; i++)
                     {
-                        // split the cells at ";"
-                        parser.TextFieldType = FieldType.Delimited;
-                        parser.SetDelimiters(";");
-
-                        while (!parser.EndOfData)
-                        {
-                            //Process row
-                            string[] fields = parser.ReadFields();
-                            foreach (string field in fields[0])
-                            {
-                                MessageBox.Show(field);
-                            }
-
-                        }
+                        string[] fields = lines[i].Split(';');
+                        wallIDs.Add(fields[0]);
                     }
                 }
             }
 
+            // group labels in panel
+            FlowLayoutPanel panelIDs = new FlowLayoutPanel();
+            panelIDs.FlowDirection = FlowDirection.TopDown;
+            panelIDs.Size = new System.Drawing.Size(300, 300);
+            panelIDs.Location = new System.Drawing.Point(300, 200);
+            List<Label> labels = new List<Label>();
+
+            foreach (string id in wallIDs)
+            {
+                labels.Add(new Label());
+            }
+
+            MessageBox.Show(labels.Count.ToString());
+
+            for (int i=0; i < labels.Count; i++)
+            {
+                labels[i].Text = wallIDs[i];
+                labels[i].AutoSize = true;
+                labels[i].Parent = panelIDs;
+
+                Label seperatorLabel = new Label();
+                seperatorLabel.AutoSize = false;
+                seperatorLabel.Height = 2;
+                seperatorLabel.BorderStyle = BorderStyle.Fixed3D;
+
+                seperatorLabel.Parent = panelIDs;
+            }
+
+            this.Controls.Add(panelIDs);
 
             // add match material button
             place_match_button();
-
-            this.Controls.Add(grid);
 
         }
 
