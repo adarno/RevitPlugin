@@ -76,28 +76,35 @@ namespace UI_Prototype
             FlowLayoutPanel panelIDs = new FlowLayoutPanel();
             panelIDs.FlowDirection = FlowDirection.TopDown;
             panelIDs.Size = new System.Drawing.Size(300, 300);
-            panelIDs.Location = new System.Drawing.Point(300, 200);
+            panelIDs.Location = new System.Drawing.Point(70, 150);
             List<Label> labels = new List<Label>();
+
+            // add name of column
+            labels.Add(new Label());
+            labels[0].Text = "Wall Elements";
+            labels[0].Size = new System.Drawing.Size(100, 25);
+            labels[0].Parent = panelIDs;
 
             foreach (string id in wallIDs)
             {
                 labels.Add(new Label());
             }
 
-            MessageBox.Show(labels.Count.ToString());
+            //MessageBox.Show(labels.Count.ToString());
 
-            for (int i=0; i < labels.Count; i++)
+            for (int i=1; i < labels.Count; i++)
             {
-                labels[i].Text = wallIDs[i];
-                labels[i].AutoSize = true;
+                labels[i].Text = wallIDs[i-1];
+                labels[i].Size = new System.Drawing.Size(100, 25);
+                labels[i].Padding = new System.Windows.Forms.Padding(5);
                 labels[i].Parent = panelIDs;
 
-                Label seperatorLabel = new Label();
-                seperatorLabel.AutoSize = false;
-                seperatorLabel.Height = 2;
-                seperatorLabel.BorderStyle = BorderStyle.Fixed3D;
+                Label separatorLabel = new Label();
+                separatorLabel.AutoSize = false;
+                separatorLabel.Height = 2;
+                separatorLabel.BorderStyle = BorderStyle.Fixed3D;
 
-                seperatorLabel.Parent = panelIDs;
+                separatorLabel.Parent = panelIDs;
             }
 
             this.Controls.Add(panelIDs);
