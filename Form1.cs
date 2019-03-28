@@ -19,6 +19,7 @@ namespace UI_Prototype
         RoundedButton splitWallButton = new RoundedButton();
         RoundedButton assignButton = new RoundedButton();
         RoundedButton createMaterialButton = new RoundedButton();
+        FlowLayoutPanel parentPanel = new FlowLayoutPanel();
 
         public Form1()
         {
@@ -58,27 +59,16 @@ namespace UI_Prototype
                 {
                     String path = ofd.FileName.ToString();
                     string[] lines = System.IO.File.ReadAllLines(path);
-                    
-                    for (int i=1; i < lines.Length; i++) //start at 1 because first line in csv is column names
+
+                    for (int i = 1; i < lines.Length; i++) //start at 1 because first line in csv is column names
                     {
                         string[] fields = lines[i].Split(';');
                         wallIDs.Add(fields[0]);
-                    }
 
-                    for (int i = 1; i < lines.Length; i++)
-                    {
-                        string[] fields = lines[i].Split(';');
-                        List<string> fieldsList = new List<string>(fields);
+                        string[] data = lines[i].Split('"');
+                        wallData.Add(data[1]);
+                        //MessageBox.Show(data[1]);
 
-                        fieldsList.RemoveAt(0);
-
-                        StringBuilder stringBuilder = new StringBuilder();
-                        foreach (string field in fieldsList)
-                        {
-                            stringBuilder.Append(field);
-                        }
-
-                        wallData.Add(stringBuilder.ToString());
                     }
                 }
             }
@@ -94,8 +84,8 @@ namespace UI_Prototype
         private void place_gridPanels(List<string> wallIDs, List<string> wallData)
         {
             // create parent panel for elementPanel and dataPanel
-            FlowLayoutPanel parentPanel = new FlowLayoutPanel();
             parentPanel.Size = new System.Drawing.Size(1000, 500);
+            //parentPanel.AutoSize = true;
             parentPanel.Location = new System.Drawing.Point(70, 150);
             parentPanel.FlowDirection = FlowDirection.LeftToRight;
 
@@ -136,20 +126,19 @@ namespace UI_Prototype
                 separatorLabel.Parent = panelIDs;
             }
 
-            //this.Controls.Add(panelIDs);
 
             // panel for wall data
             FlowLayoutPanel panelData = new FlowLayoutPanel();
             panelData.Name = "dataPanel";
             panelData.FlowDirection = FlowDirection.TopDown;
-            panelData.Size = new System.Drawing.Size(300, 300);
+            panelData.Size = new System.Drawing.Size(600, 800);
             panelData.Location = new System.Drawing.Point(300, 200);
             List<Label> dataLabels = new List<Label>();
 
             // add name of column
             dataLabels.Add(new Label());
             dataLabels[0].Text = "Material";
-            dataLabels[0].Size = new System.Drawing.Size(100, 25);
+            dataLabels[0].Size = new System.Drawing.Size(300, 25);
             dataLabels[0].Parent = panelData;
 
             foreach (string id in wallIDs)
@@ -162,20 +151,18 @@ namespace UI_Prototype
             for (int i = 1; i < labels.Count; i++)
             {
                 dataLabels[i].Text = wallData[i - 1];
-                dataLabels[i].Size = new System.Drawing.Size(300, 50);
+                dataLabels[i].Size = new System.Drawing.Size(600, 25);
                 dataLabels[i].Padding = new System.Windows.Forms.Padding(5);
                 dataLabels[i].Parent = panelData;
 
                 Label separatorLabel = new Label();
                 separatorLabel.AutoSize = false;
                 separatorLabel.Height = 2;
+                separatorLabel.Width = 400;
                 separatorLabel.BorderStyle = BorderStyle.Fixed3D;
 
                 separatorLabel.Parent = panelData;
             }
-
-            //this.Controls.Add(panelIDs);
-            //this.Controls.Add(panelData);
             
             panelIDs.Parent = parentPanel;
             panelData.Parent = parentPanel;
@@ -213,14 +200,14 @@ namespace UI_Prototype
                 this.createMaterialButton.Hide();
 
                 // change location of grid panel
-                //panel.Location = new System.Drawing.Point(70, 150);
+                parentPanel.Location = new System.Drawing.Point(70, 150);
 
                 this.matchButtonActive = false;
             }
             else
             {
                 // change location of grid panel
-                //panel.Location = new System.Drawing.Point(70, 300);
+                parentPanel.Location = new System.Drawing.Point(70, 200);
 
                 place_sub_buttons();
                 this.matchButtonActive = true;
