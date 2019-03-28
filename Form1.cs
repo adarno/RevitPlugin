@@ -48,13 +48,8 @@ namespace UI_Prototype
             Button button = sender as Button;
             button.Size = new System.Drawing.Size(200, 35);
 
-            //grid view
-            DataGridView grid = new DataGridView();
-            grid.Location = new System.Drawing.Point(300, 300);
-            grid.ColumnCount = 1;
-            grid.Columns[0].Name = "Wall Elements";
-
             List<string> wallIDs = new List<string>();
+            List<string> wallData = new List<string>();
 
             // open file
             using (OpenFileDialog ofd = new OpenFileDialog() { Filter = "CSV|*.csv", ValidateNames = true })
@@ -64,19 +59,53 @@ namespace UI_Prototype
                     String path = ofd.FileName.ToString();
                     string[] lines = System.IO.File.ReadAllLines(path);
                     
-                    for (int i=1; i < lines.Length; i++)
+                    for (int i=1; i < lines.Length; i++) //start at 1 because first line in csv is column names
                     {
                         string[] fields = lines[i].Split(';');
                         wallIDs.Add(fields[0]);
                     }
+
+                    for (int i = 1; i < lines.Length; i++)
+                    {
+                        string[] fields = lines[i].Split(';');
+                        List<string> fieldsList = new List<string>(fields);
+
+                        fieldsList.RemoveAt(0);
+
+                        StringBuilder stringBuilder = new StringBuilder();
+                        foreach (string field in fieldsList)
+                        {
+                            stringBuilder.Append(field);
+                        }
+
+                        wallData.Add(stringBuilder.ToString());
+                    }
                 }
             }
 
-            // group labels in panel
+            place_gridPanels(wallIDs, wallData);
+           
+
+            // add match material button
+            place_match_button();
+
+        }
+
+        private void place_gridPanels(List<string> wallIDs, List<string> wallData)
+        {
+            // create parent panel for elementPanel and dataPanel
+            FlowLayoutPanel parentPanel = new FlowLayoutPanel();
+            parentPanel.Size = new System.Drawing.Size(1000, 500);
+            parentPanel.Location = new System.Drawing.Point(70, 150);
+            parentPanel.FlowDirection = FlowDirection.LeftToRight;
+
+
+            // panel for element IDs
             FlowLayoutPanel panelIDs = new FlowLayoutPanel();
+            panelIDs.Name = "elementsPanel";
             panelIDs.FlowDirection = FlowDirection.TopDown;
-            panelIDs.Size = new System.Drawing.Size(300, 300);
-            panelIDs.Location = new System.Drawing.Point(70, 150);
+            panelIDs.Size = new System.Drawing.Size(100, 300);
+            panelIDs.Location = new System.Drawing.Point(70, 200);
             List<Label> labels = new List<Label>();
 
             // add name of column
@@ -92,9 +121,9 @@ namespace UI_Prototype
 
             //MessageBox.Show(labels.Count.ToString());
 
-            for (int i=1; i < labels.Count; i++)
+            for (int i = 1; i < labels.Count; i++)
             {
-                labels[i].Text = wallIDs[i-1];
+                labels[i].Text = wallIDs[i - 1];
                 labels[i].Size = new System.Drawing.Size(100, 25);
                 labels[i].Padding = new System.Windows.Forms.Padding(5);
                 labels[i].Parent = panelIDs;
@@ -107,10 +136,51 @@ namespace UI_Prototype
                 separatorLabel.Parent = panelIDs;
             }
 
-            this.Controls.Add(panelIDs);
+            //this.Controls.Add(panelIDs);
 
-            // add match material button
-            place_match_button();
+            // panel for wall data
+            FlowLayoutPanel panelData = new FlowLayoutPanel();
+            panelData.Name = "dataPanel";
+            panelData.FlowDirection = FlowDirection.TopDown;
+            panelData.Size = new System.Drawing.Size(300, 300);
+            panelData.Location = new System.Drawing.Point(300, 200);
+            List<Label> dataLabels = new List<Label>();
+
+            // add name of column
+            dataLabels.Add(new Label());
+            dataLabels[0].Text = "Material";
+            dataLabels[0].Size = new System.Drawing.Size(100, 25);
+            dataLabels[0].Parent = panelData;
+
+            foreach (string id in wallIDs)
+            {
+                dataLabels.Add(new Label());
+            }
+
+            //MessageBox.Show(labels.Count.ToString());
+
+            for (int i = 1; i < labels.Count; i++)
+            {
+                dataLabels[i].Text = wallData[i - 1];
+                dataLabels[i].Size = new System.Drawing.Size(300, 50);
+                dataLabels[i].Padding = new System.Windows.Forms.Padding(5);
+                dataLabels[i].Parent = panelData;
+
+                Label separatorLabel = new Label();
+                separatorLabel.AutoSize = false;
+                separatorLabel.Height = 2;
+                separatorLabel.BorderStyle = BorderStyle.Fixed3D;
+
+                separatorLabel.Parent = panelData;
+            }
+
+            //this.Controls.Add(panelIDs);
+            //this.Controls.Add(panelData);
+            
+            panelIDs.Parent = parentPanel;
+            panelData.Parent = parentPanel;
+
+            this.Controls.Add(parentPanel);
 
         }
 
@@ -131,6 +201,9 @@ namespace UI_Prototype
 
         private void match_button_Click(object sender, EventArgs e)
         {
+            // get instance of panel
+            FlowLayoutPanel panel = this.Controls.Find("elementPanel", true).FirstOrDefault() as FlowLayoutPanel;
+
             Button button = sender as Button;
             if (this.matchButtonActive)
             {
@@ -139,10 +212,16 @@ namespace UI_Prototype
                 this.splitWallButton.Hide();
                 this.createMaterialButton.Hide();
 
+                // change location of grid panel
+                //panel.Location = new System.Drawing.Point(70, 150);
+
                 this.matchButtonActive = false;
             }
             else
             {
+                // change location of grid panel
+                //panel.Location = new System.Drawing.Point(70, 300);
+
                 place_sub_buttons();
                 this.matchButtonActive = true;
             }
@@ -165,7 +244,7 @@ namespace UI_Prototype
             splitWallButton.Anchor = (AnchorStyles.Right | AnchorStyles.Top);
             this.Controls.Add(splitWallButton);
 
-            // assign manually button
+            // assign manual button
             this.assignButton = new RoundedButton();
             assignButton.Text = "Assign Manually";
             EventHandler assignEventHandler = new EventHandler(myButton_Click);
