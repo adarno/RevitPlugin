@@ -16,6 +16,7 @@ namespace UI_Prototype
     public partial class Form1 : Form
     {
         bool matchButtonActive = false;
+        bool fileImported = false;
         RoundedButton splitWallButton = new RoundedButton();
         RoundedButton assignButton = new RoundedButton();
         RoundedButton createMaterialButton = new RoundedButton();
@@ -42,12 +43,11 @@ namespace UI_Prototype
             this.Controls.Add(myButton);
         }
 
+        // import button
         private void myButton_Click(Object sender, EventArgs e)
         {
 
-            // change button size
-            Button button = sender as Button;
-            button.Size = new System.Drawing.Size(200, 35);
+            
 
             List<string> wallIDs = new List<string>();
             List<string> wallData = new List<string>();
@@ -57,6 +57,11 @@ namespace UI_Prototype
             {
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
+                    // change button size
+                    Button button = sender as Button;
+                    button.Size = new System.Drawing.Size(200, 35);
+
+                    fileImported = true;
                     String path = ofd.FileName.ToString();
                     string[] lines = System.IO.File.ReadAllLines(path);
 
@@ -70,14 +75,16 @@ namespace UI_Prototype
                         //MessageBox.Show(data[1]);
 
                     }
+
+                    place_gridPanels(wallIDs, wallData);
+                    
+                    // add match material button
+                    place_match_button();
                 }
+                
             }
 
-            place_gridPanels(wallIDs, wallData);
-           
-
-            // add match material button
-            place_match_button();
+            
 
         }
 
